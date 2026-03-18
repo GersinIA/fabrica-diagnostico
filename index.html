@@ -28,8 +28,14 @@
 
 <body>
     <!-- Backend Oculto Netlify Forms -->
-    <form name="diagnosticos" data-netlify="true" hidden>
+    <form name="diagnosticos" data-netlify="true" netlify-honeypot="bot-field" action="/" method="POST"
+        style="display:none;">
+        <input type="hidden" name="form-name" value="diagnosticos" />
+        <p class="hidden">
+            <label>Preencha se for humano: <input name="bot-field" /></label>
+        </p>
         <input type="text" name="dados" />
+        <button type="submit">Enviar</button>
     </form>
 
     <div id="root"></div>
