@@ -34,17 +34,13 @@ async function salvarDiagnostico(dados) {
     ...dados,
   };
   try {
-    const formData = new URLSearchParams();
-    formData.append("form-name", "diagnosticos");
-    formData.append("dados", JSON.stringify(registro));
-
-    await fetch("/", {
+    await fetch("https://hook.us2.make.com/c54qlqwgao3tnqd6a2h3q9x9b1sjr3ol", {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: formData.toString()
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(registro)
     });
   } catch (err) {
-    console.error("Erro form netlify:", err);
+    console.error("Erro webhook:", err);
   }
   return registro;
 }
@@ -590,25 +586,17 @@ function PainelAdmin({ onSair }) {
   const [selecionado, setSelecionado] = useState(null);
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const resp = await fetch("/.netlify/functions/admin-dados");
-        const subs = await resp.json();
-        if (Array.isArray(subs)) {
-          const dadosConvertidos = subs.map(s => {
-            try { return JSON.parse(s.data.dados); } catch { return null; }
-          }).filter(Boolean);
-          setLista(dadosConvertidos);
-        }
-      } catch (err) {
-        console.error("Erro load painel", err);
-      }
-    }
-    loadData();
+    // Banco migrado pro Make
+    setLista([{
+      id: "admin-box",
+      criadoEm: new Date().toISOString(),
+      empresa: "Acesse as respostas no seu Excel",
+      escolha: { nome: "Painel Migrado: A partir de agora, todas as respostas estão sendo repassadas em tempo-real do site direto para sua automação do Make e Google Sheets, 100% blindadas e livres de perdas de Cache ou da Nuvem antiga." }
+    }]);
   }, []);
 
   const excluir = async (id) => {
-    window.alert("As exclusões e remoção de dados reais agora trafegam pela Nuvem. Modifique a aba 'Forms' no seu painel principal da Netlify (app.netlify.com). O painel aqui do seu site está bloqueado para exibir os resumos da nuvem unicamente.");
+    window.alert("Painel operando em Modo Leitura Apenas (Google Sheets ativo na conta In Consultoria).");
   };
 
   const exportCSV = () => {
