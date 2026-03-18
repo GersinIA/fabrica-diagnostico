@@ -67,6 +67,10 @@ DIAGNÓSTICO:
 - Contexto extra: ${form.extra}
 ${feedback ? "- Feedback do participante: " + feedback : ""}
 
+REGRAS GLOBAIS RIGOROSAS:
+A empresa precisa de inteligência sistêmica. NUNCA sugira agentes conversacionais, "Chatbots para WhatsApp/Instagram/Direct", ou robôs de SAC. Ignore completamente soluções de "atendimento automático de clientes". 
+Concentre-se em sistemas e interfaces internas, cruzamento de dados, automação financeira, gestão de equipe inteligente e plataformas de negócio.
+
 Responda APENAS com JSON válido, sem markdown:
 {
   "resumo": "3-4 linhas resumindo o problema central, impacto no negócio e potencial de solução com IA. Direto, empático, específico.",
@@ -524,7 +528,7 @@ function TelaIA({ form, onConfirmar }) {
 
       {/* Confirmar */}
       <div style={G.nav}>
-        <button style={G.btnNx(!escolha)} disabled={!escolha} onClick={() => onConfirmar(escolha, resultado?.resumo)}>
+        <button style={G.btnNx(!escolha)} disabled={!escolha} onClick={() => onConfirmar(escolha, resultado?.resumo, resultado?.solucoes)}>
           Confirmar projeto escolhido ✓
         </button>
       </div>
@@ -681,6 +685,21 @@ function PainelAdmin({ onSair }) {
                 </div>
               )}
 
+              {/* Todas as Opções Sugeridas */}
+              {selecionado.todasSolucoes && selecionado.todasSolucoes.length > 0 && (
+                <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 11, padding: "1rem", marginBottom: "1rem" }}>
+                  <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(255,255,255,0.4)", marginBottom: 10 }}>Todas as opções pensadas pela IA</div>
+                  {selecionado.todasSolucoes.map((s, idx) => (
+                    <div key={idx} style={{ marginBottom: idx === selecionado.todasSolucoes.length - 1 ? 0 : 12 }}>
+                      <div style={{ fontSize: 13, fontWeight: 500, color: "#fff", marginBottom: 2 }}>
+                        {s.nome} {selecionado.escolha?.nome === s.nome && <span style={{ color: CORES.gold, fontSize: 10, marginLeft: 6 }}>(Escolhida)</span>}
+                      </div>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", lineHeight: 1.4 }}>{s.descricao}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {/* Resumo IA */}
               {selecionado.resumoIA && (
                 <div style={{ background: "rgba(16,185,129,0.04)", border: "1px solid rgba(16,185,129,0.12)", borderRadius: 11, padding: "1rem", marginBottom: "1rem" }}>
@@ -738,9 +757,9 @@ function App() {
     setTimeout(() => setTapCount(0), 2000);
   };
 
-  const confirmar = async (sol, resumoIA) => {
+  const confirmar = async (sol, resumoIA, todasSolucoes) => {
     setEscolha(sol);
-    await salvarDiagnostico({ ...form, escolha: sol, resumoIA });
+    await salvarDiagnostico({ ...form, escolha: sol, resumoIA, todasSolucoes });
     setTela("sucesso");
   };
 
