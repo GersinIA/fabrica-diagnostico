@@ -28,14 +28,24 @@ async function storageSet(key, val) {
 }
 
 async function salvarDiagnostico(dados) {
-  const lista = (await storageGet(STORAGE_KEY)) || [];
   const registro = {
     id: Date.now().toString(),
     criadoEm: new Date().toISOString(),
     ...dados,
   };
-  lista.push(registro);
-  await storageSet(STORAGE_KEY, lista);
+  try {
+    const formData = new URLSearchParams();
+    formData.append("form-name", "diagnosticos");
+    formData.append("dados", JSON.stringify(registro));
+
+    await fetch("/", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: formData.toString()
+    });
+  } catch (err) {
+    console.error("Erro form netlify:", err);
+  }
   return registro;
 }
 
@@ -580,15 +590,25 @@ function PainelAdmin({ onSair }) {
   const [selecionado, setSelecionado] = useState(null);
 
   useEffect(() => {
-    storageGet(STORAGE_KEY).then(d => setLista(d || []));
+    async function loadData() {
+      try {
+        const resp = await fetch("/.netlify/functions/admin-dados");
+        const subs = await resp.json();
+        if (Array.isArray(subs)) {
+          const dadosConvertidos = subs.map(s => {
+            try { return JSON.parse(s.data.dados); } catch { return null; }
+          }).filter(Boolean);
+          setLista(dadosConvertidos);
+        }
+      } catch (err) {
+        console.error("Erro load painel", err);
+      }
+    }
+    loadData();
   }, []);
 
   const excluir = async (id) => {
-    if (!window.confirm("Excluir este diagnóstico?")) return;
-    const nova = lista.filter(i => i.id !== id);
-    await storageSet(STORAGE_KEY, nova);
-    setLista(nova);
-    if (selecionado?.id === id) setSelecionado(null);
+    window.alert("As exclusões e remoção de dados reais agora trafegam pela Nuvem. Modifique a aba 'Forms' no seu painel principal da Netlify (app.netlify.com). O painel aqui do seu site está bloqueado para exibir os resumos da nuvem unicamente.");
   };
 
   const exportCSV = () => {
