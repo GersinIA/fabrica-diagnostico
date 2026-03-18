@@ -1,0 +1,8 @@
+# Secrets
+.env
+
+# Netlify
+.netlify/
+
+# Dependências (caso aplicável)
+node_modules/
